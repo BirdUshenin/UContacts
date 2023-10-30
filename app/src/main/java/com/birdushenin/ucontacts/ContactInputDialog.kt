@@ -22,7 +22,7 @@ class ContactInputDialog(context: Context, private val onContactAdded: (Contact)
                 onContactAdded(newContact)
                 dismiss()
             } else {
-                // Обработка ошибки, если поля не заполнены
+
             }
         }
     }
