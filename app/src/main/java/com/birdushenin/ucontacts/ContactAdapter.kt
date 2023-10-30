@@ -1,5 +1,6 @@
 package com.birdushenin.ucontacts
 
+import android.app.Dialog
 import android.provider.ContactsContract.Contacts
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 class ContactAdapter(var contacts: List<Contact>) : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
     var onItemLongClickListener: ((Contact) -> Unit)? = null
+    var onItemClickListener: ((Contact) -> Unit)? = null
+
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val idS: TextView  = view.findViewById(R.id.id)
@@ -19,12 +22,15 @@ class ContactAdapter(var contacts: List<Contact>) : RecyclerView.Adapter<Contact
         val numberQ: TextView = view.findViewById(R.id.number)
 
         init {
-            view.setOnLongClickListener{
+            view.setOnClickListener {
+                val contact = contacts[adapterPosition]
+                onItemClickListener?.invoke(contact)
+            }
+            view.setOnLongClickListener {
                 val contact = contacts[adapterPosition]
                 onItemLongClickListener?.invoke(contact)
                 Log.d("Long","Y")
                 true
-
             }
         }
 

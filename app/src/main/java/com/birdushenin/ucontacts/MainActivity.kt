@@ -51,6 +51,13 @@ class MainActivity : AppCompatActivity() {
         adapter.onItemLongClickListener = { contact ->
             removeContact(contact)
         }
+
+        adapter.onItemClickListener = { contact ->
+            val editContactDialog = EditContactDialog(this, contact) { editedName, editedNumber ->
+                editContact(contact, editedName, editedNumber)
+            }
+            editContactDialog.show()
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -69,9 +76,14 @@ class MainActivity : AppCompatActivity() {
         adapter.updateContacts(updateContacts)
     }
 
-    private fun editContact(contact: Contact){
+    private fun editContact(contact: Contact, editName: String, editNumber: String){
         val updateContacts = adapter.contacts.toMutableList()
-
+        val index = updateContacts.indexOf(contact)
+        if (index != -1){
+            val updateContact = contact.copy(name = editName, phoneNumber = editNumber)
+            updateContacts[index] = updateContact
+            adapter.updateContacts(updateContacts)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
