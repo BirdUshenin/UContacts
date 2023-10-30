@@ -17,6 +17,7 @@ import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var adapter: ContactAdapter
     lateinit var binding: ActivityMainBinding
     private lateinit var recyclerView: RecyclerView
     private val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 123
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        adapter = ContactAdapter(emptyList())
 
         if (ContextCompat.checkSelfPermission(this, "android.permission.READ_CONTACTS") != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf("android.permission.READ_CONTACTS"), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
@@ -37,6 +39,19 @@ class MainActivity : AppCompatActivity() {
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.adapter = adapter
         }
+        binding.addButton.setOnClickListener{
+            val contactInputDialog = ContactInputDialog(this){ newContact ->
+                addContact(newContact)
+                Log.d("addButton","YES")
+            }
+            contactInputDialog.show()
+        }
+    }
+
+    private fun addContact(newContact: Contact){
+        val updateContacts = adapter.contacts.toMutableList()
+        updateContacts.add(newContact)
+        adapter.updateContacts(updateContacts)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
