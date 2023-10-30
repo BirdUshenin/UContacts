@@ -35,10 +35,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.d("App","ERROR")
             val contacts = getContactsFromPhone()
-            val adapter = ContactAdapter(contacts)
+            adapter = ContactAdapter(contacts)
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.adapter = adapter
         }
+
         binding.addButton.setOnClickListener{
             val contactInputDialog = ContactInputDialog(this){ newContact ->
                 addContact(newContact)
@@ -46,12 +47,31 @@ class MainActivity : AppCompatActivity() {
             }
             contactInputDialog.show()
         }
+
+        adapter.onItemLongClickListener = { contact ->
+            removeContact(contact)
+        }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun addContact(newContact: Contact){
         val updateContacts = adapter.contacts.toMutableList()
+        Log.d("Проверка 1", "Список ДО $updateContacts")
         updateContacts.add(newContact)
+        Log.d("Проверка 2", "Список ПОСЛЕ $updateContacts")
         adapter.updateContacts(updateContacts)
+//        adapter.notifyDataSetChanged()
+    }
+
+    private fun removeContact(contact: Contact){
+        val updateContacts = adapter.contacts.toMutableList()
+        updateContacts.remove(contact)
+        adapter.updateContacts(updateContacts)
+    }
+
+    private fun editContact(contact: Contact){
+        val updateContacts = adapter.contacts.toMutableList()
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -60,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             MY_PERMISSIONS_REQUEST_READ_CONTACTS -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     val contacts = getContactsFromPhone()
-                    val adapter = ContactAdapter(contacts)
+                    adapter = ContactAdapter(contacts)
                     recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
                     recyclerView.layoutManager = LinearLayoutManager(this)
                     recyclerView.adapter = adapter
