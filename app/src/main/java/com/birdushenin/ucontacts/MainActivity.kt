@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
         if (ContextCompat.checkSelfPermission(this, "android.permission.READ_CONTACTS") != PackageManager.PERMISSION_GRANTED) {
-            // Разрешение не предоставлено, запрашиваем его у пользователя
             ActivityCompat.requestPermissions(this, arrayOf("android.permission.READ_CONTACTS"), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
         } else {
             Log.d("App","ERROR")
@@ -38,7 +37,6 @@ class MainActivity : AppCompatActivity() {
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.adapter = adapter
         }
-
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -46,7 +44,6 @@ class MainActivity : AppCompatActivity() {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_READ_CONTACTS -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Разрешение предоставлено, выполняем код для доступа к контактам
                     val contacts = getContactsFromPhone()
                     val adapter = ContactAdapter(contacts)
                     recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
@@ -87,13 +84,6 @@ class MainActivity : AppCompatActivity() {
                         null
                     )
 
-//                val phoneCursor = contentResolver.query(
-//                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-//                    null,
-//                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-//                    arrayOf(id),
-//                    null
-//                )
                     var phoneNumber = ""
 
                     if (phoneCursor != null && phoneCursor.moveToNext()) {
@@ -101,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                             phoneCursor.getString(phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
                         phoneCursor.close()
                     }
-
+                    Log.d("App", "Name: $name, Phone: $phoneNumber, id: $id")
                     contactsList.add(Contact(id, name, phoneNumber))
                 }
             }
