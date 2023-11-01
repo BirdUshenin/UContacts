@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -14,14 +15,17 @@ class ContactAdapter(var contacts: List<Contact>) : RecyclerView.Adapter<Contact
 
     var onItemLongClickListener: ((Contact) -> Unit)? = null
     var onItemClickListener: ((Contact) -> Unit)? = null
-
+    var viewHolders = mutableListOf<ViewHolder>()
+    val list = listOf<ViewHolder>()
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         val idS: TextView  = view.findViewById(R.id.id)
         val nameA: TextView = view.findViewById(R.id.name)
         val numberQ: TextView = view.findViewById(R.id.number)
+        val checkBox: CheckBox = view.findViewById(R.id.checkBox)
 
         init {
+
             view.setOnClickListener {
                 val contact = contacts[adapterPosition]
                 onItemClickListener?.invoke(contact)
@@ -29,9 +33,12 @@ class ContactAdapter(var contacts: List<Contact>) : RecyclerView.Adapter<Contact
             view.setOnLongClickListener {
                 val contact = contacts[adapterPosition]
                 onItemLongClickListener?.invoke(contact)
-                Log.d("Long","Y")
+
+                checkBox.visibility = View.VISIBLE
                 true
             }
+
+
         }
 
         fun bind(contact: Contact){
@@ -39,6 +46,7 @@ class ContactAdapter(var contacts: List<Contact>) : RecyclerView.Adapter<Contact
             nameA.text = contact.name
             numberQ.text = contact.phoneNumber
         }
+
     }
 
     fun updateContacts(newContacts: List<Contact>){
@@ -54,9 +62,11 @@ class ContactAdapter(var contacts: List<Contact>) : RecyclerView.Adapter<Contact
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(contacts[position])
+        viewHolders.add(holder)
     }
 
     override fun getItemCount(): Int {
         return contacts.size
     }
+
 }
