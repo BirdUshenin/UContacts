@@ -1,9 +1,6 @@
 package com.birdushenin.ucontacts
 
-import android.app.Dialog
-import android.content.Context
-import android.provider.ContactsContract.Contacts
-import android.util.Log
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,10 +18,11 @@ class ContactAdapter(
     var onItemClickListener: ((Contact) -> Unit)? = null
     var viewHolders = mutableListOf<ViewHolder>()
     var isLongPressPussy: Boolean = false
+    val CheckedItems = mutableMapOf<Int, Boolean>()
 
 
-    inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
-        val idS: TextView  = view.findViewById(R.id.id)
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val idS: TextView = view.findViewById(R.id.id)
         val nameA: TextView = view.findViewById(R.id.name)
         val numberQ: TextView = view.findViewById(R.id.number)
         val checkBox: CheckBox = view.findViewById(R.id.checkBox)
@@ -42,32 +40,38 @@ class ContactAdapter(
                 checkBox.visibility = View.VISIBLE
                 true
             }
+
+            checkBox.setOnCheckedChangeListener { _, isChecking ->
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    CheckedItems[position] = isChecking
+                }
+            }
         }
 
-        fun bind(contact: Contact){
+        fun bind(contact: Contact) {
             idS.text = contact.id
             nameA.text = contact.name
             numberQ.text = contact.phoneNumber
         }
 
-        fun setCheckboxChecked(checked: Boolean){
+        fun setCheckboxChecked(checked: Boolean) {
             checkBox.isChecked = checked
         }
-
     }
 
-    fun CheckBox(){
+
+    fun CheckBox() {
         viewHolders.forEach { holder ->
             holder.checkBox
         }
     }
 
-    fun pressToAll(contact: Contact){
+    fun pressToAll(contact: Contact) {
         viewHolders.forEach { holder ->
             holder.setCheckboxChecked(checked = true)
         }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_list, parent, false)
@@ -75,10 +79,13 @@ class ContactAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(contacts[position])
 
-        if (isLongPressPussy){
+        val contact = contacts[position]
+        holder.bind(contact)
+
+        if (isLongPressPussy) {
             holder.checkBox.visibility = View.VISIBLE
+            holder.checkBox.isChecked = CheckedItems[position] ?: false
         } else {
             holder.checkBox.visibility = View.INVISIBLE
         }
@@ -89,9 +96,21 @@ class ContactAdapter(
         return contacts.size
     }
 
-    fun updateContacts(newContacts: List<Contact>){
+    fun updateContacts(newContacts: List<Contact>) {
         val diffResult = DiffUtil.calculateDiff(ContactDiffUtil(contacts, newContacts))
         contacts = newContacts
         diffResult.dispatchUpdatesTo(this)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun deleteSelectedContacts() {
+        val positionsToRemove = CheckedItems.entries.filter { it.value }.map { it.key }
+        val contactsToRemove = positionsToRemove.mapNotNull { contacts.getOrNull(it) }
+        val newContacts = contacts.toMutableList()
+        newContacts.removeAll(contactsToRemove)
+        updateContacts(newContacts)
+        CheckedItems.clear()
+        isLongPressPussy = false
+        notifyDataSetChanged()
     }
 }

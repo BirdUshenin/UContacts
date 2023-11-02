@@ -1,23 +1,17 @@
 package com.birdushenin.ucontacts
 
-import android.Manifest.permission.READ_CONTACTS
 import android.annotation.SuppressLint
-import android.app.appsearch.SetSchemaRequest.READ_CONTACTS
 import android.content.pm.PackageManager
-import android.opengl.Visibility
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
-import android.view.View
 import android.view.View.VISIBLE
-import android.widget.CheckBox
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.birdushenin.ucontacts.databinding.ActivityMainBinding
-import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,20 +20,25 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 123
 
-
-    private var Contactw = mutableListOf<Contact>()
-
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView = findViewById(R.id.recyclerView)
         adapter = ContactAdapter(emptyList())
 
-        if (ContextCompat.checkSelfPermission(this, "android.permission.READ_CONTACTS") != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf("android.permission.READ_CONTACTS"), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                "android.permission.READ_CONTACTS"
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf("android.permission.READ_CONTACTS"),
+                MY_PERMISSIONS_REQUEST_READ_CONTACTS
+            )
         } else {
             val contacts = getContactsFromPhone()
             adapter = ContactAdapter(contacts)
@@ -47,8 +46,8 @@ class MainActivity : AppCompatActivity() {
             recyclerView.adapter = adapter
         }
 
-        binding.addButton.setOnClickListener{
-            val contactInputDialog = ContactInputDialog(this){ newContact ->
+        binding.addButton.setOnClickListener {
+            val contactInputDialog = ContactInputDialog(this) { newContact ->
                 addContact(newContact)
             }
             contactInputDialog.show()
@@ -56,15 +55,13 @@ class MainActivity : AppCompatActivity() {
 
         adapter.onItemLongClickListener = { contact ->
             adapter.isLongPressPussy = true
+            val removeButton = binding.removeButton
 
-
-           val removeButton = binding.removeButton
-           removeButton.visibility = VISIBLE
+            removeButton.visibility = VISIBLE
+            adapter.CheckBox()
 
             binding.removeButton.setOnClickListener {
-                adapter.CheckBox()
-                    removeContact(contact)
-
+                adapter.deleteSelectedContacts()
             }
             adapter.notifyDataSetChanged()
         }
@@ -78,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun addContact(newContact: Contact){
+    private fun addContact(newContact: Contact) {
         val updateContacts = adapter.contacts.toMutableList()
         Log.d("Проверка 1", "Список ДО $updateContacts")
         updateContacts.add(newContact)
@@ -86,30 +83,28 @@ class MainActivity : AppCompatActivity() {
         adapter.updateContacts(updateContacts)
     }
 
-    private fun removeContact(contact: Contact){
-        val updateContacts = adapter.contacts.toMutableList()
-        updateContacts.remove(contact)
-        adapter.updateContacts(updateContacts)
-    }
-
-    private fun editContact(contact: Contact, editName: String, editNumber: String){
+    private fun editContact(contact: Contact, editName: String, editNumber: String) {
         val updateContacts = adapter.contacts.toMutableList()
         val index = updateContacts.indexOf(contact)
-        if (index != -1){
+        if (index != -1) {
             val updateContact = contact.copy(name = editName, phoneNumber = editNumber)
             updateContacts[index] = updateContact
             adapter.updateContacts(updateContacts)
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_READ_CONTACTS -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     val contacts = getContactsFromPhone()
                     adapter = ContactAdapter(contacts)
-                    recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+                    recyclerView = findViewById(R.id.recyclerView)
                     recyclerView.layoutManager = LinearLayoutManager(this)
                     recyclerView.adapter = adapter
                 } else {
@@ -135,7 +130,8 @@ class MainActivity : AppCompatActivity() {
         if (cursor != null && cursor.count > 0) {
             while (cursor.moveToNext()) {
                 val id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID))
-                val name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
+                val name =
+                    cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME))
 
                 // Проверка на null
                 if (name != null) {

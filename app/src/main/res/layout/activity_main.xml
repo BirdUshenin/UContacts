@@ -13,25 +13,28 @@
         android:layout_marginTop="56dp"
         app:layout_constraintTop_toBottomOf="@+id/addButton" />
 
-    <ImageButton
+    <ImageView
         android:id="@+id/removeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:src="@drawable/ic_baseline_restore_from_trash_24"
-        app:layout_constraintBottom_toBottomOf="@+id/addButton"
         android:visibility="invisible"
+        android:clickable="true"
+        android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addButton"
-        app:layout_constraintTop_toTopOf="@+id/addButton" />
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <ImageView
         android:id="@+id/addButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:clickable="true"
+        android:src="@drawable/ic_baseline_person_add_alt_1_24"
         android:text="Добавить контакт"
-        android:layout_marginTop="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/removeButton"
+        app:layout_constraintEnd_toStartOf="@+id/removeButton"
+        app:layout_constraintTop_toTopOf="@+id/removeButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
