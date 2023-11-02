@@ -26,6 +26,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 123
 
+
+    private var Contactw = mutableListOf<Contact>()
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -51,27 +55,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         adapter.onItemLongClickListener = { contact ->
-//            removeContact(contact)
-
-            val removeButton = binding.removeButton
-            removeButton.visibility = VISIBLE
+            adapter.isLongPressPussy = true
 
 
+           val removeButton = binding.removeButton
+           removeButton.visibility = VISIBLE
 
-//            for (holder in adapter.viewHolders) {
-//                holder.checkBox.visibility = VISIBLE
-//
-//            }
+            binding.removeButton.setOnClickListener {
+                adapter.CheckBox()
+                    removeContact(contact)
 
-            for (holder in adapter.list) {
-                holder.checkBox.visibility = VISIBLE
             }
+            adapter.notifyDataSetChanged()
         }
-
-        binding.removeButton.setOnClickListener{
-
-        }
-
 
         adapter.onItemClickListener = { contact ->
             val editContactDialog = EditContactDialog(this, contact) { editedName, editedNumber ->
