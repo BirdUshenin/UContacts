@@ -4,10 +4,14 @@ import android.Manifest.permission.READ_CONTACTS
 import android.annotation.SuppressLint
 import android.app.appsearch.SetSchemaRequest.READ_CONTACTS
 import android.content.pm.PackageManager
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
+import android.view.View
+import android.view.View.VISIBLE
+import android.widget.CheckBox
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +26,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private val MY_PERMISSIONS_REQUEST_READ_CONTACTS = 123
 
+
+    private var Contactw = mutableListOf<Contact>()
+
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -33,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         if (ContextCompat.checkSelfPermission(this, "android.permission.READ_CONTACTS") != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf("android.permission.READ_CONTACTS"), MY_PERMISSIONS_REQUEST_READ_CONTACTS)
         } else {
-            Log.d("App","ERROR")
             val contacts = getContactsFromPhone()
             adapter = ContactAdapter(contacts)
             recyclerView.layoutManager = LinearLayoutManager(this)
@@ -43,13 +50,23 @@ class MainActivity : AppCompatActivity() {
         binding.addButton.setOnClickListener{
             val contactInputDialog = ContactInputDialog(this){ newContact ->
                 addContact(newContact)
-                Log.d("addButton","YES")
             }
             contactInputDialog.show()
         }
 
         adapter.onItemLongClickListener = { contact ->
-            removeContact(contact)
+            adapter.isLongPressPussy = true
+
+
+           val removeButton = binding.removeButton
+           removeButton.visibility = VISIBLE
+
+            binding.removeButton.setOnClickListener {
+                adapter.CheckBox()
+                    removeContact(contact)
+
+            }
+            adapter.notifyDataSetChanged()
         }
 
         adapter.onItemClickListener = { contact ->
@@ -67,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         updateContacts.add(newContact)
         Log.d("Проверка 2", "Список ПОСЛЕ $updateContacts")
         adapter.updateContacts(updateContacts)
-//        adapter.notifyDataSetChanged()
     }
 
     private fun removeContact(contact: Contact){
